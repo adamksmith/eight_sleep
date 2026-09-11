@@ -214,18 +214,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         dev_reg.async_get_or_create(
             config_entry_id=entry.entry_id,
             identifiers={(DOMAIN, _get_device_unique_id(eight, user))},
-            name=f"{user.user_profile['firstName']}'s Eight Sleep Side",
+            name=f"{(user.user_profile or {}).get('firstName') or user.side or 'Eight Sleep'}'s Eight Sleep Side",
             via_device=(DOMAIN, _get_device_unique_id(eight)),
             **device_data,
         )
 
     if eight.base_user:
-        base_hardware_info = eight.base_user.base_data.get("hardwareInfo", {})
+        base_hardware_info = eight.base_user.base_data.get("hardwareInfo") or {}
         base_device_data = {
             ATTR_MANUFACTURER: "Eight Sleep",
-            ATTR_MODEL: base_hardware_info['sku'],
-            ATTR_HW_VERSION: base_hardware_info['hardwareVersion'],
-            ATTR_SW_VERSION: base_hardware_info['softwareVersion'],
+            ATTR_MODEL: base_hardware_info.get('sku'),
+            ATTR_HW_VERSION: base_hardware_info.get('hardwareVersion'),
+            ATTR_SW_VERSION: base_hardware_info.get('softwareVersion'),
         }
 
         dev_reg.async_get_or_create(
